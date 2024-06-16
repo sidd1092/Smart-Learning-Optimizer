@@ -32,6 +32,7 @@ def get_unique_filename(output_path):
         while os.path.exists(output_path):
             base, extension = os.path.splitext(output_path)
             new_filename = simpledialog.askstring("File exists", "File already exists. Enter a extra add-on to name of file:")
+            new_filename = new_filename.replace(" ", "_")
             if new_filename:
                 output_path = base + "_" + new_filename + extension
             else:
@@ -49,8 +50,8 @@ pdf_path = filedialog.askopenfilename(filetypes=[("PDF Files", "*.pdf")])
 # Check if a file was selected
 if pdf_path:
     extracted_text = extract_text_from_pdf(pdf_path)
-    output_filename = os.path.splitext(os.path.basename(pdf_path))[0] + "_extracted_text.txt"
-    output_path = os.path.join(os.path.expanduser("~"), "Downloads", output_filename)
+    output_filename ="input.txt"
+    output_path = r"C:\Users\ssidd\OneDrive\Desktop\minorProject_try1\input_s" + "\\" + output_filename
     unique_output_path = get_unique_filename(output_path)
     if unique_output_path:
         save_text_to_file(extracted_text, unique_output_path)
