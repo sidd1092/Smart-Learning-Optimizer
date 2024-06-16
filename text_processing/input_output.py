@@ -6,5 +6,6 @@ def read_input_text(input_file):
 
 # Write the rephrased text to a new file
 def write_rephrased_text(rephrased_text, output_file):
-    with open(output_file, 'w') as file:
+    output_path = r'C:\Users\ssidd\OneDrive\Desktop\minorProject_try1\Output_s'
+    with open(output_path, 'w') as file:
         file.write(rephrased_text)
