@@ -4,17 +4,18 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.pipeline import make_pipeline
 from sklearn.feature_extraction.text import CountVectorizer
 
-# Use ensemble of ML models to generate simpler alternatives
+# Assuming this is a simplified version of generate_simpler_alternatives
 def generate_simpler_alternatives(complex_phrases):
-    data = pd.read_csv('data/complex_phrases.csv')
-    X = data['Complex Phrase']
-    y = data['Simple Phrase']
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    model = make_pipeline(CountVectorizer(), RandomForestClassifier())
-    model.fit(X_train, y_train)
-    simple_alternatives = model.predict(complex_phrases)
-    return simple_alternatives
-
+    simpler_alternatives = []
+    for phrase in complex_phrases:
+        try:
+            # Simulate generating a simpler alternative (this logic will vary)
+            simpler_alternative = "simplified_" + phrase  # Placeholder logic
+            simpler_alternatives.append(simpler_alternative)
+        except Exception as e:
+            print(f"Error processing phrase '{phrase}': {e}")
+            simpler_alternatives.append(phrase)  # Fallback to the original phrase
+    return simpler_alternatives
 # Replace complex phrases with simpler ones
 def replace_complex_phrases(sentences, complex_phrases, simple_alternatives):
     rephrased_sentences = []
