@@ -9,7 +9,7 @@ from text_processing.postprocessing import postprocess_text
 def main():
     # Initialize Tkinter root
     root = tk.Tk()
-    root.withdraw()  # Hide the main window
+    root.withdraw()   # Hide the main window
 
     # Open file dialog for selecting the input file
     input_file = filedialog.askopenfilename(
