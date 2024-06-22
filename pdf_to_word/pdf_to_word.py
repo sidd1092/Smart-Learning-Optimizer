@@ -1,12 +1,12 @@
-import tkinter as tk
-from tkinter import filedialog, messagebox
-import fitz  # PyMuPDF
-from docx import Document
-from docx.shared import Inches
-import io
 from PIL import Image
+import io
 import tempfile
 import os
+from docx.shared import Inches
+import fitz  # PyMuPDF
+from docx import Document
+import tkinter as tk
+from tkinter import filedialog, messagebox
 
 def convert_pdf_to_word_with_images(pdf_path, word_path):
     document = Document()
@@ -27,18 +27,18 @@ def convert_pdf_to_word_with_images(pdf_path, word_path):
                 image_stream = io.BytesIO(image_bytes)
                 image = Image.open(image_stream)
 
-                if image.info.get('dpi'):
-                    dpi = image.info['dpi'][0]  # Use the image's actual DPI if available
-                else:
-                    dpi = 96  # Fallback DPI
+                # Use the image's actual DPI if available, otherwise assume 96 DPI
+                dpi_x, dpi_y = image.info.get('dpi', (96, 96))
+                width_inches = image.width / dpi_x
+                height_inches = image.height / dpi_y
 
-                width_inches = image.width / dpi
-
+                # Save the image to a temporary file
                 with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as tmp_image:
                     image.save(tmp_image.name)
-                    document.add_picture(tmp_image.name, width=Inches(width_inches))
+                    # Insert the image with specified size, maintaining aspect ratio
+                    document.add_picture(tmp_image.name, width=Inches(width_inches), height=Inches(height_inches))
 
-                os.unlink(tmp_image.name)
+                os.unlink(tmp_image.name)  # Clean up the temporary file
             except Exception as e:
                 print(f"Error processing image {image_index} on page {page_num}: {e}")
 
