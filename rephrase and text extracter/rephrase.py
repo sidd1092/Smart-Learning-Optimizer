@@ -1,34 +1,28 @@
 from transformers import pipeline
-import tkinter as tk
-from tkinter import filedialog
+import os
+import tensorflow as tf
 
+# Suppress TensorFlow warnings
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'  # 0 = all messages are logged, 1 = INFO messages are not printed, 2 = INFO and WARNING messages are not printed, 3 = INFO, WARNING, and ERROR messages are not printed
+
+# Ensure that deprecation warnings are not shown
+tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 # Initialize the paraphrase generator
 paraphrase_generator = pipeline("text2text-generation", model="t5-base")
 
-# Create a Tkinter root window
-root = tk.Tk()
-root.withdraw()
+# Read input text file
+input_file_path = r'C:\Users\ssidd\OneDrive\Desktop\minorProject_try1\input_s\input.txt'
+output_file_path = r'C:\Users\ssidd\OneDrive\Desktop\minorProject_try1\Output_s\aaa_.txt'
 
-# Prompt the user to select the input file
-input_file_path = filedialog.askopenfilename(title="Select Input File")
-
-# Prompt the user to select the output file
-output_file_path = filedialog.asksaveasfilename(title="Select Output File")
-
-# Check if the user canceled the file selection
-if not input_file_path or not output_file_path:
-    print("File selection canceled.")
-    exit()
-
-
-with open(input_file_path, 'r') as file:
+with open(input_file_path, 'r', encoding='utf-8') as file:
     input_text = file.read()
 
 # Generate paraphrases
 paraphrased_text = paraphrase_generator(input_text, max_length=512, num_return_sequences=1)[0]['generated_text']
 
 # Write the paraphrased text to an output file
-with open(output_file_path, 'w') as file:
+with open(output_file_path, 'w', encoding='utf-8') as file:
     file.write(paraphrased_text)
 
 print("Paraphrasing complete. Check the output file for results.")
+
