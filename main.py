@@ -4,7 +4,7 @@ from text_processing.input_output import read_input_text, write_rephrased_text
 from text_processing.preprocessing import preprocess_text
 from text_processing.phrase_identification import identify_complex_phrases
 from text_processing.model import generate_simpler_alternatives, replace_complex_phrases
-from text_processing.postprocessing import postprocess_text
+from text_processing.postprocessing  import postprocess_text
 
 def main():
     # Initialize Tkinter root
