@@ -1,12 +1,12 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox
+import fitz  # PyMuPDF
 from docx import Document
+from docx.shared import Inches
 import io
 from PIL import Image
 import tempfile
 import os
-
-import fitz  # PyMuPDF
 
 def convert_pdf_to_word_with_images(pdf_path, word_path):
     document = Document()
@@ -18,42 +18,35 @@ def convert_pdf_to_word_with_images(pdf_path, word_path):
         text = page.get_text("text")
         document.add_paragraph(text)
 
-        # Extract images
         for image_index, img in enumerate(page.get_images(full=True)):
-            # get the XREF of the image
             xref = img[0]
-            # Extract the image bytes
-            base_image = pdf.extract_image(xref)
-            image_bytes = base_image["image"]
+            try:
+                base_image = pdf.extract_image(xref)
+                image_bytes = base_image["image"]
 
-            # Use BytesIO to handle the image as a file-like object
-            image_stream = io.BytesIO(image_bytes)
-            image = Image.open(image_stream)
+                image_stream = io.BytesIO(image_bytes)
+                image = Image.open(image_stream)
 
-            # Convert color space to RGB if necessary
-            if image.mode in ["CMYK", "RGBA"]:
-                image = image.convert("RGB")
+                if image.info.get('dpi'):
+                    dpi = image.info['dpi'][0]  # Use the image's actual DPI if available
+                else:
+                    dpi = 96  # Fallback DPI
 
-            # Handle transparency by filling the background with white
-            if image.mode == "RGBA":
-                filled_image = Image.new("RGB", image.size, (255, 255, 255))
-                filled_image.paste(image, mask=image.split()[3])  # 3 is the alpha channel
-                image = filled_image
+                width_inches = image.width / dpi
 
-            # Save the image to a temporary file and insert into the document
-            with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as tmp_image:
-                image.save(tmp_image.name)
-                document.add_picture(tmp_image.name)
+                with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as tmp_image:
+                    image.save(tmp_image.name)
+                    document.add_picture(tmp_image.name, width=Inches(width_inches))
 
-            # Optionally, remove the temporary file if desired
-            os.unlink(tmp_image.name)
+                os.unlink(tmp_image.name)
+            except Exception as e:
+                print(f"Error processing image {image_index} on page {page_num}: {e}")
 
-    # Save the Word document
     document.save(word_path)
 
 def convert_pdf_to_word_with_dialog():
     root = tk.Tk()
-    root.withdraw()  # to hide the small tk window
+    root.withdraw()  # Hide the small tk window
     pdf_path = filedialog.askopenfilename(title="Select PDF File", filetypes=[("PDF files", "*.pdf")])
     if not pdf_path:
         messagebox.showerror("Error", "No PDF file selected!")
