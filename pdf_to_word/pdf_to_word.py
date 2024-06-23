@@ -16,7 +16,16 @@ def convert_pdf_to_word_with_images(pdf_path, word_path):
     for page_num in range(len(pdf)):
         page = pdf.load_page(page_num)
         text = page.get_text("text")
-        document.add_paragraph(text)
+        paragraphs = text.split('\n\n')  # Assuming double line breaks for new paragraphs
+
+        for para in paragraphs:
+            if para.startswith(('-', '•', '*')) or para[0].isdigit() and para[1] == '.':
+                # This is a simplistic check for bullet points; may need refinement
+                p = document.add_paragraph()
+                p.add_run(para)
+                p.style = 'ListBullet'
+            else:
+                document.add_paragraph(para)
 
         for image_index, img in enumerate(page.get_images(full=True)):
             xref = img[0]
@@ -27,18 +36,15 @@ def convert_pdf_to_word_with_images(pdf_path, word_path):
                 image_stream = io.BytesIO(image_bytes)
                 image = Image.open(image_stream)
 
-                # Use the image's actual DPI if available, otherwise assume 96 DPI
-                dpi_x, dpi_y = image.info.get('dpi', (96, 96))
+                dpi_x, dpi_y = image.info.get('dpi', (132, 132))
                 width_inches = image.width / dpi_x
                 height_inches = image.height / dpi_y
 
-                # Save the image to a temporary file
                 with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as tmp_image:
                     image.save(tmp_image.name)
-                    # Insert the image with specified size, maintaining aspect ratio
                     document.add_picture(tmp_image.name, width=Inches(width_inches), height=Inches(height_inches))
 
-                os.unlink(tmp_image.name)  # Clean up the temporary file
+                os.unlink(tmp_image.name)
             except Exception as e:
                 print(f"Error processing image {image_index} on page {page_num}: {e}")
 
@@ -46,7 +52,7 @@ def convert_pdf_to_word_with_images(pdf_path, word_path):
 
 def convert_pdf_to_word_with_dialog():
     root = tk.Tk()
-    root.withdraw()  # Hide the small tk window
+    root.withdraw()
     pdf_path = filedialog.askopenfilename(title="Select PDF File", filetypes=[("PDF files", "*.pdf")])
     if not pdf_path:
         messagebox.showerror("Error", "No PDF file selected!")
