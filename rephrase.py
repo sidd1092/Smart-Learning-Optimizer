@@ -80,7 +80,7 @@ import openai
 
 def rephrase_text_with_chat(text):
     # Set your OpenAI API key here
-    openai.api_key = "sk-proj-wUyed3Ao0Fvy9WVGwwaUT3BlbkFJqUZt1Jywu1so3wT73rMl"
+    openai.api_key = "your api"
 
     try:
         # Constructing the messages for chat-based rephrasing
