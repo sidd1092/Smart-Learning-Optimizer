@@ -1,22 +1,41 @@
-# # import openai
+import fitz  # PyMuPDF
+from docx import Document
+import pytesseract
+from PIL import Image
+import io
 
-# # openai.api_key = 'sk-proj-wUyed3Ao0Fvy9WVGwwaUT3BlbkFJqUZt1Jywu1so3wT73rMl'
+# Configure pytesseract path to your installation path
+pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
-# # completion = openai.ChatCompletion.create(
-# #   model="gpt-3.5-turbo",
-# #   messages=[
-# #     {"role": "system", "content": "You are a helpful assistant."},
-# #     {"role": "user", "content": "Hello!"}
-# #   ]
-# # )
+def pdf_to_word(pdf_path, word_path):
+    # Open the PDF
+    pdf = fitz.open(pdf_path)
+    doc = Document()
 
-# # print(completion.choices[0].message)
+    for page_num in range(len(pdf)):
+        page = pdf.load_page(page_num)
+        
+        # Extract text
+        text = page.get_text("text")
+        doc.add_paragraph(text)
+        
+        # Extract images
+        image_list = page.get_images(full=True)
+        for image_index, img in enumerate(page.get_images(full=True)):
+            # Get the image XREF
+            xref = img[0]
+            base_image = pdf.extract_image(xref)
+            image_bytes = base_image["image"]
 
+            # Convert it to a PIL Image
+            image = Image.open(io.BytesIO(image_bytes))
+            
+            # Perform OCR
+            ocr_text = pytesseract.image_to_string(image)
+            doc.add_paragraph(ocr_text)
+    
+    # Save the Word document
+    doc.save(word_path)
 
-# # if needed, install and/or upgrade to the latest version of the OpenAI Python library
-# %pip install --upgrade openai
-# # import the OpenAI Python library for calling the OpenAI API
-# from openai import OpenAI
-# import os
-
-# client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY", "<your OpenAI API key if not set as env var>"))
+# Example usage
+pdf_to_word("input.pdf", "output.docx")
