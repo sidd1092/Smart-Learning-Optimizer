@@ -10,7 +10,7 @@ pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tessera
 def pdf_to_word(pdf_path, word_path):
     # Open the PDF
     pdf = fitz.open(pdf_path)
-    doc = Document()
+    doc = Document() 
 
     for page_num in range(len(pdf)):
         page = pdf.load_page(page_num)
@@ -28,7 +28,7 @@ def pdf_to_word(pdf_path, word_path):
             image_bytes = base_image["image"]
 
             # Convert it to a PIL Image
-            image = Image.open(io.BytesIO(image_bytes))
+            image =  Image.open(io.BytesIO(image_bytes))
             
             # Perform OCR
             ocr_text = pytesseract.image_to_string(image)
